@@ -21,7 +21,7 @@ def readucr(filename):
     X = data[:,1:]
     return X, Y
   
-nb_epochs = 5000
+nb_epochs = 500
 
      
 #flist = ['Adiac', 'Beef', 'CBF', 'ChlorineConcentration', 'CinC_ECG_torso', 'Coffee', 'Cricket_X', 'Cricket_Y', 'Cricket_Z', 
@@ -38,23 +38,32 @@ for each in flist:
     nb_classes =len(np.unique(y_test))
     y_train = (y_train - y_train.min())/(y_train.max()-y_train.min())*(nb_classes-1)
     y_test = (y_test - y_test.min())/(y_test.max()-y_test.min())*(nb_classes-1)
+    print(x_train.shape[0])
+
     batch_size = min(x_train.shape[0]/10, 16)
     
     Y_train = keras.utils.to_categorical(y_train, nb_classes)
     Y_test = keras.utils.to_categorical(y_test, nb_classes)
-     
+
+    print('x_train: ',x_train)     
     x_train_mean = x_train.mean()
+    print('x_train_mean: ',x_train_mean)
     x_train_std = x_train.std()
+    print('x_train_std: ',x_train_std)
     x_train = (x_train - x_train_mean)/(x_train_std)
+    print('x_train: ',x_train)
+
      
    # x_test_min = np.min(x_test, axis = 1, keepdims=1)
    # x_test_max = np.max(x_test, axis = 1, keepdims=1)
     x_test = (x_test - x_train_mean)/(x_train_std)
-     
+    print('x_test: ',x_test)     
+
     #x_train = x_train.reshape(x_train.shape + (1,))
     #x_test = x_test.reshape(x_test.shape + (1,))
-    
+    print('x_train.shape[1:]: ',x_train.shape[1:])    
     x = keras.layers.Input(x_train.shape[1:])
+    print('x: ',x)
     y= keras.layers.Dropout(0.1)(x)
     y = keras.layers.Dense(500, activation='relu')(y)
     y = keras.layers.Dropout(0.2)(y)
@@ -78,8 +87,10 @@ for each in flist:
               verbose=1, validation_data=(x_test, Y_test), 
                 #callbacks = [TestCallback((x_train, Y_train)), reduce_lr, keras.callbacks.TensorBoard(log_dir='./log'+fname, histogram_freq=1)])
                  callbacks=[reduce_lr])
-    
+    print("model.predict(x_test)",model.predict(x_test))
+    print("np.argmax(model.predict(x_test))",np.argmax(model.predict(x_test), axis=1))
     #Print the testing results which has the lowest training loss.
     log = pd.DataFrame(hist.history)
     print(log.loc[log['loss'].idxmin]['loss'], log.loc[log['loss'].idxmin]['val_accuracy'])
+
 

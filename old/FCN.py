@@ -83,6 +83,32 @@ for each in flist:
                       patience=50, min_lr=0.0001) 
     hist = model.fit(x_train, Y_train, batch_size=batch_size, epochs=nb_epochs,
               verbose=1, validation_data=(x_test, Y_test), callbacks = [reduce_lr])
+    print("np.argmax(model.predict(x_test))",np.argmax(model.predict(x_test), axis=1))
+    x_test_result= np.argmax(model.predict(x_test), axis=1)
+    resultTest=[]
+    temp1=0
+    for i in range(len(x_test_result)):
+        if(x_test_result[i]==y_test[i]):
+            resultTest.append(0)
+        else:
+            resultTest.append(1)
+            temp1=temp1+1
+    print("resultTest",resultTest)
+    print("temp1",temp1)
+
+    temp2=0
+    print("np.argmax(model.predict(x_train))",np.argmax(model.predict(x_train), axis=1))
+    x_train_result= np.argmax(model.predict(x_train), axis=1)
+    resultTrain=[]
+    for i in range(len(x_train_result)):
+        if(x_train_result[i]==y_train[i]):
+            resultTrain.append(0)
+        else:
+            resultTrain.append(1)
+            temp2=temp2+1
+    print("resultTrain",resultTrain)
+    print("temp2",temp2)
+
     #Print the testing results which has the lowest training loss.
     log = pd.DataFrame(hist.history)
     print(log.loc[log['loss'].idxmin]['loss'], log.loc[log['loss'].idxmin]['val_accuracy'])
